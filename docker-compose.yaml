@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  minio:
+    image: minio/minio
+    container_name: minio
+    # env_file:
+    #   - ./.env
+    environment:
+      - MINIO_ROOT_USER=minioadmin #"AKIAIOSFODNN7DEV"
+      - MINIO_ROOT_PASSWORD=minioadmin #"LhU7i7FR7QbxVmuZXDupa/6XShoKYZUUycGhoBxeqe4"
+    command: server --console-address ":9001" /data
+    volumes:
+      - minio_storage:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    networks:
+      - microservices
+
+volumes:
+  minio_storage:
+    driver: local
+
+networks:
+  microservices:
+    name: microservices
+    driver: bridge
