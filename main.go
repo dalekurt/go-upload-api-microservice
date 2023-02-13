@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
     _ "github.com/joho/godotenv/autoload" // load .env file automatically
     "upload_api/config"
 	"upload_api/routers"
@@ -9,11 +10,11 @@ import (
 func main() {
 
 	minioUpload.MinioConnection()
-	
+
 	router := routers.SetupRouter()
-	err := router.Run()
+	err := router.Run(":8080") //TODO Use environment variable PORT
 
 	if err != nil {
-		return
+		log.Fatalf("Server error: %s", err)
 	}  
 }
