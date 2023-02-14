@@ -18,15 +18,19 @@ RUN go mod download
 # Copy the source from the current directory to the Working Directory inside the container
 COPY . .
 
-RUN CGO_ENABLED=0 go build main.go
+RUN CGO_ENABLED=0 go build -o upload main.go
 
 # Generate clean, finale image
 FROM alpine:latest as server
 
 WORKDIR /app
 
-COPY --from=builder /app/main ./
+COPY --from=builder /app/upload ./
 
-RUN chmod +x ./main
+EXPOSE 8080
 
-CMD [ "./main" ]
+# USER nonroot:nonroot
+
+# RUN chmod +x ./main
+
+CMD [ "./upload" ]
