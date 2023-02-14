@@ -21,7 +21,7 @@ services:
     networks:
       - microservices
   zookeeper:
-    image: zookeeper:3.8.1
+    image: confluentinc/cp-zookeeper:latest
     container_name: zookeeper
     ports:
       - 2181:2181
@@ -31,7 +31,7 @@ services:
     networks:
       - microservices
   kafka:
-    image: ubuntu/kafka:3.1-22.04_edge
+    image: confluentinc/cp-kafka:latest
     container_name: kafka
     ports:
       - 9092:9092
