@@ -4,20 +4,59 @@ services:
   minio:
     image: minio/minio
     container_name: minio
-    # env_file:
-    #   - ./.env
-    environment:
-      - MINIO_ROOT_USER=minioadmin #"AKIAIOSFODNN7DEV"
-      - MINIO_ROOT_PASSWORD=minioadmin #"LhU7i7FR7QbxVmuZXDupa/6XShoKYZUUycGhoBxeqe4"
+    env_file:
+      - ./minio.env
+    # environment:
+    #   - MINIO_ROOT_USER=minioadmin #"AKIAIOSFODNN7DEV"
+    #   - MINIO_ROOT_PASSWORD=minioadmin #"LhU7i7FR7QbxVmuZXDupa/6XShoKYZUUycGhoBxeqe4"
     command: server --console-address ":9001" /data
     volumes:
       - minio_storage:/data
     ports:
       - "9000:9000"
       - "9001:9001"
+    depends_on:
+      - zookeeper
+      # - kafka
     networks:
       - microservices
-
+  zookeeper:
+    image: zookeeper:3.8.1
+    container_name: zookeeper
+    ports:
+      - 2181:2181
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - microservices
+  kafka:
+    image: ubuntu/kafka:3.1-22.04_edge
+    container_name: kafka
+    ports:
+      - 9092:9092
+      - 29092:29092
+    env_file:
+      - ./kafka.env
+    depends_on:
+      - zookeeper
+    networks:
+      - microservices
+  kafka-ui:
+    image: provectuslabs/kafka-ui
+    container_name: kafka-ui
+    ports:
+      - "8081:8080"
+    restart: always
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_0_READONLY=true
+    depends_on:
+      - zookeeper
+      - kafka
+    networks:
+      - microservices
 volumes:
   minio_storage:
     driver: local
